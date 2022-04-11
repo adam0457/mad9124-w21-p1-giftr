@@ -41,26 +41,14 @@ router.post('/users', sanitizeBody, async (req, res) => {
 })
 
 // Login a user and return an authentication token.
-/*router.post('/tokens', sanitizeBody, async (req, res) => {
+router.post('/tokens', sanitizeBody, async (req, res) => {
 
     const {email, password} = req.sanitizedBody
-    // const loginSucceeded = {
-    //                         userName:email,
-    //                         ipAddress:req.ip,
-    //                         didSucceed:true,
-    //                         createdAt:Date.now()
-    //                       };
-    // const loginFailed = {
-    //                       userName:email,
-    //                       ipAddress:req.ip,
-    //                       didSucceed:false,
-    //                       createdAt:Date.now()
-    //                     };
+    
       const user = await User.authenticate(email, password)
 
       if (!user) {
-        //const failedAttempt = new AuthAttempt(loginFailed)
-        //await failedAttempt.save()
+      
         return res.status(401).json({
           errors: [
             {
@@ -71,13 +59,12 @@ router.post('/users', sanitizeBody, async (req, res) => {
         })
       }    
       
-      //const succeededAttempt = new AuthAttempt(loginSucceeded)
-      //await succeededAttempt.save()
+      
       res.status(201).json(formatResponseData({accessToken: user.generateAuthToken()}, 'tokens'))
 })
 
 // Get the currently logged-in user
-router.get('/users/me', authenticate, async (req, res) => {
+/*router.get('/users/me', authenticate, async (req, res) => {
   const user = await User.findById(req.user._id)
   res.json(formatResponseData(user))
 })*/

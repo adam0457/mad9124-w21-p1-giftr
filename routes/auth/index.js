@@ -69,6 +69,33 @@ router.get('/users/me', authenticate, async (req, res) => {
   res.json(formatResponseData(user))
 })
 
+// User can Change his password
+router.patch('/changePassword', authenticate, sanitizeBody, async (req, res) => {
+
+  // const user = await User.findById(req.user._id)
+  // if(user.isAdmin === false){
+  //   return sendNotAdminError(res)
+  // }
+  
+      try {      
+        const user = await User.findByIdAndUpdate(
+          req.user._id,
+        
+          { ...req.sanitizedBody},
+          {
+            new: true,
+            runValidators: true
+          }
+        )        
+
+        if (!user) throw new Error('Resource not found')
+        console.log(user.firstName)
+        res.json(formatResponseData(user)) 
+      } catch (err) {
+        sendResourceNotFound(req, res)
+      }
+  })
+
 function formatResponseData(payload, type = 'users') {
   if (payload instanceof Array) {
     return {data: payload.map(resource => format(resource))}

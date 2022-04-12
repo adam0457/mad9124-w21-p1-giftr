@@ -64,10 +64,10 @@ router.post('/tokens', sanitizeBody, async (req, res) => {
 })
 
 // Get the currently logged-in user
-/*router.get('/users/me', authenticate, async (req, res) => {
+router.get('/users/me', authenticate, async (req, res) => {
   const user = await User.findById(req.user._id)
   res.json(formatResponseData(user))
-})*/
+})
 
 function formatResponseData(payload, type = 'users') {
   if (payload instanceof Array) {

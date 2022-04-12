@@ -10,7 +10,7 @@ require('./startup/database')
 app.use(morgan('tiny'))
 app.use(express.json())
 app.use(sanitizeMongo())
-//app.use('/api/students', require('./routes/students'))
+app.use('/api/people', require('./routes/people'))
 //app.use('/api/courses', require('./routes/courses'))
 app.use('/auth', authRouter)
 

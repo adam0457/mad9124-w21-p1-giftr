@@ -1,15 +1,13 @@
 'use strict'
-
-//const giftSchema = require('./Gift')
-const User = require('./User')
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
+import {giftSchema} from './Gift.js'
 
 const schema = new mongoose.Schema({
   name: {type: String, maxlength: 254, required: true},
   birthDate: {type: Date, required: true},
   owner:{type: mongoose.Schema.Types.ObjectId, ref: 'User',required:true},//TODO: THINK about the default user
   sharedWith: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-  //gifts: [giftSchema], 
+  gifts: [giftSchema], 
   imageUrl:{type:String,maxlength:1024}  
 },
 {
@@ -19,4 +17,4 @@ const schema = new mongoose.Schema({
 )
 const Model = mongoose.model('Person', schema)
 
-module.exports = Model
+export default Model

@@ -1,4 +1,4 @@
-const xss = require('xss')
+import xss from 'xss'
 
 
 const sanitize = sourceString => {
@@ -27,7 +27,7 @@ const stripTags = payload => {
   return attributes
 }
 
-module.exports = (req, res, next) => {
+export default (req, res, next) => {
   const { id, _id, ...attributes } = req.body.data.attributes
   const sanitizedBody = stripTags(attributes)
   req.sanitizedBody = sanitizedBody

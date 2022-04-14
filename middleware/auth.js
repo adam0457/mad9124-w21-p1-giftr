@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken')
+import jwt from 'jsonwebtoken'
 
 const jwtPrivateKey = 'superSecureSecret'
 
@@ -13,7 +13,7 @@ function parseToken (headerValue) {
 }
 
 
-  module.exports = (req, res, next) => {
+  export default (req, res, next) => {
   const token = parseToken(req.header('Authorization'))
   if (!token) {
     return res.status(401).json({

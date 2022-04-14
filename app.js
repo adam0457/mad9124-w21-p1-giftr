@@ -1,16 +1,20 @@
 'use strict'
 
-const morgan = require('morgan')
-const express = require('express')
+import morgan from 'morgan'
+import express from 'express'
+import sanitizeMongo from 'express-mongo-sanitize'
+import authRouter from './routes/auth/index.js'
+import peopleRouter from './routes/people.js'
+import connectDatabase from './startup/database.js'
+
+connectDatabase()
+
 const app = express()
-const sanitizeMongo = require('express-mongo-sanitize')
-const authRouter = require('./routes/auth/index.js')
-require('./startup/database')
 
 app.use(morgan('tiny'))
 app.use(express.json())
 app.use(sanitizeMongo())
-app.use('/api/people', require('./routes/people'))
+app.use('/api/people', peopleRouter)
 //app.use('/api/courses', require('./routes/courses'))
 app.use('/auth', authRouter)
 

@@ -1,25 +1,32 @@
 'use strict'
 
-const express = require('express')
-const router = express.Router()
-const sanitizeBody = require('../middleware/sanitizeBody')
-const Person = require('../models/Person')
-const User = require('../models/User')
-const authenticate = require('../middleware/auth')
+import { Router } from 'express'
+import sanitizeBody from '../middleware/sanitizeBody.js'
+import Person from '../models/Person.js'
+import User from '../models/User.js'
+import authenticate from '../middleware/auth.js'
 
-// router.get('/', authenticate, async (req, res) => {
-//   const students = await Student.find()
-//   res.json({data: students.map(student => formatResponseData('students', student.toObject()))})
-// })
+const router = Router()
+
+router.get('/', authenticate, async (req, res) => {
+ 
+  const people = await Person.find(
+                                    {
+                                      $or:[
+                                            {owner: req.user._id},
+                                            {sharedWith:{$elemMatch:{$eq:req.user._id}}}
+                                          ]
+                                    })
+
+  
+  res.json({data: people.map(person => formatResponseData('people', person.toObject()))})
+})
 
 router.post('/', authenticate, sanitizeBody, async (req, res) => {
 
-    // const user = await User.findById(req.user._id)
-    // if(user.isAdmin === false){
-    //   return sendNotAdminError(res)
-    // }
-  
+    
     try{
+      
       let newPerson = new Person(req.sanitizedBody)    
       await newPerson.save()    
       res.status(201).json({data: formatResponseData('people', newPerson.toObject())})
@@ -155,4 +162,4 @@ function sendNotAdminError(res){
   })
 }
 
-module.exports = router
+export default router

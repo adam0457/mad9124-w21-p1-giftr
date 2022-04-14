@@ -9,19 +9,27 @@ import authenticate from '../middleware/auth.js'
 
 const router = Router()
 
-// router.get('/', authenticate, async (req, res) => {
- 
-//   const people = await Person.find(
-//                                     {
-//                                       $or:[
-//                                             {owner: req.user._id},
-//                                             {sharedWith:{$elemMatch:{$eq:req.user._id}}}
-//                                           ]
-//                                     })
+router.get('/:id/gifts', authenticate, async (req, res) => { 
 
+  //Get the specific person
+  const person = await Person.findById(req.params.id)
+  if(person){
+    const currentGifts = person.gifts  
+    res.send({ data: formatResponseDataWithArray(currentGifts)})
+  }else{
+    res.status(403).json({
+      errors: [
+        {
+          status: '403',
+          title: 'The id is invalid'
+        }
+      ]
+    })
+  }
   
-//   res.json({data: people.map(person => formatResponseData('people', person.toObject()))})
-// })
+}
+
+)
 
 router.post('/:id/gifts', authenticate, sanitizeBody, async (req, res) => {
     
@@ -134,6 +142,19 @@ router.post('/:id/gifts', authenticate, sanitizeBody, async (req, res) => {
 function formatResponseData(type, resource) {
     const {id, ...attributes} = resource
     return {type, id, attributes}
+}
+
+function formatResponseDataWithArray(payload, type = 'people') {
+  if (payload instanceof Array) {
+    return payload.map((resource) => format(resource))
+  } else {
+    return format(payload)
+  }
+
+  function format(resource) {
+    const { _id, ...attributes } = resource.toObject()
+    return { type, id: _id, attributes }
+  }
 }
 
 function sendResourceNotFound(req, res){

@@ -38,18 +38,24 @@ router.post('/', authenticate, sanitizeBody, async (req, res) => {
 
 })
 
-// router.get('/:id', authenticate, async (req, res) => {
+router.get('/:id', authenticate, async (req, res) => {
+
   
-//     try {
-//       const student = await Student.findById(req.params.id)
-//       if(!student){
-//           throw new Error('Resource not found')
-//       }
-//       res.json({data: formatResponseData('students', student.toObject())})
-//     }catch(err) {
-//       sendResourceNotFound(req, res)
-//     }
-// })
+    try {
+      const person = await Person.findById(req.params.id)
+      if(!person){
+          throw new Error('Resource not found')
+      }
+      if(person.owner == req.user._id || person.sharedWith.includes(req.user._id)==true){
+
+        res.json({data: formatResponseData('people', person.toObject())})
+      }else{
+        return NotTheOwnerError(res)
+      }
+    }catch(err) {
+      sendResourceNotFound(req, res)
+    }
+})
 
 
 // router.patch('/:id', authenticate, sanitizeBody, async (req, res) => {
@@ -157,6 +163,17 @@ function sendNotAdminError(res){
       {
         status: '403',
         title: 'Only admin is allowed to do that.'
+      }
+    ]
+  })
+}
+
+function NotTheOwnerError(res){
+  res.status(403).json({
+    errors: [
+      {
+        status: '403',
+        title: 'You are not the owner or this person was not shared with you'
       }
     ]
   })

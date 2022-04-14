@@ -69,7 +69,7 @@ router.get('/users/me', authenticate, async (req, res) => {
 })
 
 // User can Change his password
-router.patch('/changePassword', authenticate, sanitizeBody, async (req, res) => {
+router.patch('/users/me', authenticate, sanitizeBody, async (req, res) => {
 
   // const user = await User.findById(req.user._id)
   // if(user.isAdmin === false){

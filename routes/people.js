@@ -83,29 +83,31 @@ router.patch('/:id', authenticate, sanitizeBody, async (req, res) => {
       
   })
 
-// router.put('/:id', authenticate, sanitizeBody, async (req, res) => {
-
-//     const user = await User.findById(req.user._id)
-//     if(user.isAdmin === false){
-//       return sendNotAdminError(res)
-//     }
-//     try {    
-//       const student = await Student.findByIdAndUpdate(
-//         req.params.id,      
-//         {...req.sanitizedBody},
-//         {
-//           new: true,
-//           overwrite: true,
-//           runValidators: true
-//         }
-//       )
-//       if (!student) throw new Error('Resource not found')
-//       res.json({data: formatResponseData('students', student.toObject())})
-//     } catch (err) {
-//       sendResourceNotFound(req, res)
+router.put('/:id', authenticate, sanitizeBody, async (req, res) => {
+  const currentPerson = await Person.findById(req.params.id)
+  if(currentPerson.owner == req.user._id || currentPerson.sharedWith.includes(req.user._id)==true){
+    
+    try {    
+      const person = await Person.findByIdAndUpdate(
+        req.params.id,      
+        {...req.sanitizedBody}, 
+        {
+          new: true,
+          overwrite: true,
+          runValidators: true
+        }
+      )
+      if (!person) throw new Error('Resource not found')
+      res.json({data: formatResponseData('people', person.toObject())})
+    } catch (err) {
+      sendResourceNotFound(req, res)
       
-//     }
-// })
+    }}else{
+      return NotTheOwnerError(res)
+    } 
+
+  }    
+)
 
 // router.delete('/:id', authenticate, async (req, res) => {
 

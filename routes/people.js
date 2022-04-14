@@ -109,20 +109,21 @@ router.put('/:id', authenticate, sanitizeBody, async (req, res) => {
   }    
 )
 
-// router.delete('/:id', authenticate, async (req, res) => {
+router.delete('/:id', authenticate, async (req, res) => {
 
-//     const user = await User.findById(req.user._id)
-//     if(user.isAdmin === false){
-//       return sendNotAdminError(res)
-//     }
-//     try {
-//       const student = await Student.findByIdAndRemove(req.params.id)
-//       if (!student) throw new Error('Resource not found')
-//       res.json({data: formatResponseData('students', student.toObject())})
-//     } catch (err) {
-//       sendResourceNotFound(req, res)
-//     }
-// })
+  const currentPerson = await Person.findById(req.params.id)
+  if(currentPerson.owner == req.user._id){ 
+    try {
+      const person = await Person.findByIdAndRemove(req.params.id)
+      if (!person) throw new Error('Resource not found')
+      res.json({data: formatResponseData('people', person.toObject())})
+    } catch (err) {
+      sendResourceNotFound(req, res)
+    }
+  }else{
+    return NotTheOwnerDeleteError(res)
+  }
+})
 
 /**
  * Format the response data object according to JSON:API v1.0
@@ -176,6 +177,17 @@ function NotTheOwnerError(res){
       {
         status: '403',
         title: 'You are not the owner or this person was not shared with you'
+      }
+    ]
+  })
+}
+
+function NotTheOwnerDeleteError(res){
+  res.status(403).json({
+    errors: [
+      {
+        status: '403',
+        title: 'Only the owner has the permission to delete'
       }
     ]
   })

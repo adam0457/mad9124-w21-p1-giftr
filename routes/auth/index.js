@@ -1,10 +1,9 @@
-const express = require('express')
-const User = require('../../models/User.js')
-const sanitizeBody = require('../../middleware/sanitizeBody.js')
-const authenticate = require('../../middleware/auth.js')
-//const AuthAttempt = require('../../models/AuthenticateAttempts')
+import { Router } from 'express'
+import User from '../../models/User.js'
+import sanitizeBody from '../../middleware/sanitizeBody.js'
+import authenticate from '../../middleware/auth.js'
 
-const router = express.Router()
+const router = Router()
 
 // Register a new user
 router.post('/users', sanitizeBody, async (req, res) => {
@@ -65,12 +64,12 @@ router.post('/tokens', sanitizeBody, async (req, res) => {
 
 // Get the currently logged-in user
 router.get('/users/me', authenticate, async (req, res) => {
-  const user = await User.findById(req.user._id)
+  const user = await findById(req.user._id)
   res.json(formatResponseData(user))
 })
 
 // User can Change his password
-router.patch('/changePassword', authenticate, sanitizeBody, async (req, res) => {
+router.patch('/users/me', authenticate, sanitizeBody, async (req, res) => {
 
   // const user = await User.findById(req.user._id)
   // if(user.isAdmin === false){
@@ -78,7 +77,7 @@ router.patch('/changePassword', authenticate, sanitizeBody, async (req, res) => 
   // }
   
       try {      
-        const user = await User.findByIdAndUpdate(
+        const user = await findByIdAndUpdate(
           req.user._id,
         
           { ...req.sanitizedBody},
@@ -110,4 +109,4 @@ function formatResponseData(payload, type = 'users') {
 }
 
 
-module.exports = router
+export default router

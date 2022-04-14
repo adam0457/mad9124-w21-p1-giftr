@@ -1,8 +1,8 @@
 'use strict'
+import mongoose from 'mongoose'
 
-const mongoose = require('mongoose')
-mongoose
-  .connect('mongodb://localhost:27017/Giftr', {
+export default function () {
+mongoose.connect('mongodb://localhost:27017/Giftr', {
     useNewUrlParser: true
   })
   .then(() => console.log('Connected to MongoDB ...'))
@@ -10,3 +10,5 @@ mongoose
     console.error('Problem connecting to MongoDB ...', err.message)
     process.exit(1)
   })
+
+}

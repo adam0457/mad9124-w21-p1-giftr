@@ -9,11 +9,8 @@ export const giftSchema = new mongoose.Schema({
   imageUrl: {type: String, maxlength: 1024},
   store:{
       name:{type:String, maxlength:254},
-      productUrl:{type:String, maxlength:1024}
+      productURL:{type:String, maxlength:1024}
   }
-},{
-   //automatically includes createdAt and updatedAt properties
-  timestamps:true,
 })
 const Gift = mongoose.model('Gift', giftSchema)
 

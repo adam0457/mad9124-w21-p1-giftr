@@ -5,6 +5,7 @@ import express from 'express'
 import sanitizeMongo from 'express-mongo-sanitize'
 import authRouter from './routes/auth/index.js'
 import peopleRouter from './routes/people.js'
+import giftsRouter from './routes/gifts.js'
 import connectDatabase from './startup/database.js'
 
 connectDatabase()
@@ -15,7 +16,8 @@ app.use(morgan('tiny'))
 app.use(express.json())
 app.use(sanitizeMongo())
 app.use('/api/people', peopleRouter)
-//app.use('/api/courses', require('./routes/courses'))
+app.use('/api/people', giftsRouter)
+
 app.use('/auth', authRouter)
 
 const port = process.env.PORT || 3030

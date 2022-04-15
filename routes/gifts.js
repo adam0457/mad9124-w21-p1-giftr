@@ -31,7 +31,8 @@ router.get('/:id/gifts', authenticate, async (req, res) => {
 
 )
 
-router.post('/:id/gifts', authenticate, sanitizeBody, async (req, res) => {
+/* The previous one
+  router.post('/:id/gifts', authenticate, sanitizeBody, async (req, res) => {
     
     try{
       
@@ -45,33 +46,35 @@ router.post('/:id/gifts', authenticate, sanitizeBody, async (req, res) => {
     }
 
 })
+*/
 
-// router.get('/:id', authenticate, async (req, res) => {
+router.post('/:id/gifts', authenticate, sanitizeBody, async (req, res) => {
+    
+    try{
+      
+      let newGift = new Gift(req.sanitizedBody)    
+      await newGift.save() 
+    
+      const currentPerson = await Person.findById(req.params.id)
+      currentPerson.gifts.push(newGift)
+      await Person.findByIdAndUpdate(req.params.id,{...currentPerson},{new:true,runValidators:true}) 
+      res.status(201).json({data: formatResponseData('gifts', newGift.toObject())})
 
-  
-//     try {
-//       const person = await Person.findById(req.params.id)
-//       if(!person){
-//           throw new Error('Resource not found')
-//       }
-//       if(person.owner == req.user._id || person.sharedWith.includes(req.user._id)==true){
+    }catch(err){
 
-//         res.json({data: formatResponseData('people', person.toObject())})
-//       }else{
-//         return NotTheOwnerError(res)
-//       }
-//     }catch(err) {
-//       sendResourceNotFound(req, res)
-//     }
-// })
+      sendNotAbleToPostError(res)
+    }
+
+})
 
 
-// router.patch('/:id', authenticate, sanitizeBody, async (req, res) => {
+
+// router.patch('/:id/gifts/:giftId', authenticate, sanitizeBody, async (req, res) => {
 //   const currentPerson = await Person.findById(req.params.id)
 //   if(currentPerson.owner == req.user._id || currentPerson.sharedWith.includes(req.user._id)==true){
 //     try {      
-//       const person = await Person.findByIdAndUpdate(
-//         req.params.id,
+//       const gift = await Gift.findByIdAndUpdate(
+//         req.params.giftId,
       
 //         { ...req.sanitizedBody},
 //         {
@@ -80,8 +83,8 @@ router.post('/:id/gifts', authenticate, sanitizeBody, async (req, res) => {
 //         }
 //       )        
 
-//       if (!person) throw new Error('Resource not found')        
-//       res.json({data: formatResponseData('people', person.toObject())})
+//       if (!gift) throw new Error('Resource not found')        
+//       res.json({data: formatResponseData('gifts', gift.toObject())})
 //     } catch (err) {
 //       sendResourceNotFound(req, res)
 //     }    
@@ -91,47 +94,51 @@ router.post('/:id/gifts', authenticate, sanitizeBody, async (req, res) => {
       
 //   })
 
-// router.put('/:id', authenticate, sanitizeBody, async (req, res) => {
-//   const currentPerson = await Person.findById(req.params.id)
-//   if(currentPerson.owner == req.user._id || currentPerson.sharedWith.includes(req.user._id)==true){
-    
-//     try {    
-//       const person = await Person.findByIdAndUpdate(
-//         req.params.id,      
-//         {...req.sanitizedBody}, 
-//         {
-//           new: true,
-//           overwrite: true,
-//           runValidators: true
-//         }
-//       )
-//       if (!person) throw new Error('Resource not found')
-//       res.json({data: formatResponseData('people', person.toObject())})
-//     } catch (err) {
-//       sendResourceNotFound(req, res)
-      
-//     }}else{
-//       return NotTheOwnerError(res)
-//     } 
 
-//   }    
-// )
+router.delete('/:id/gifts/:giftId', authenticate, async (req, res) => {
 
-// router.delete('/:id', authenticate, async (req, res) => {
+  const currentPerson = await Person.findById(req.params.id)
+  if(currentPerson.owner == req.user._id){ 
+    try {
+      const gift = await Gift.findByIdAndRemove(req.params.giftId)
+      currentPerson.gifts.id(req.params.giftId).remove()
+      currentPerson.save()
 
-//   const currentPerson = await Person.findById(req.params.id)
-//   if(currentPerson.owner == req.user._id){ 
-//     try {
-//       const person = await Person.findByIdAndRemove(req.params.id)
-//       if (!person) throw new Error('Resource not found')
-//       res.json({data: formatResponseData('people', person.toObject())})
-//     } catch (err) {
-//       sendResourceNotFound(req, res)
-//     }
-//   }else{
-//     return NotTheOwnerDeleteError(res)
-//   }
-// })
+      if (!gift) throw new Error('Resource not found')
+      res.json({data: formatResponseData('gifts', gift.toObject())})
+    } catch (err) {
+      sendResourceNotFound(req, res)
+    }
+  }else{
+    return NotTheOwnerDeleteError(res)
+  }
+
+})
+
+
+//router.delete('/:id/gifts/:giftId', authenticate, async (req, res) => {
+
+  // const currentPerson = await Person.findById(req.params.id)
+  // if (!currentPerson) throw new Error('Resource not found')
+  // const giftInPerson = currentPerson.gifts.id(req.params.giftId)
+  // const indexOfCurrentGift = currentPerson.gifts.indexOf(giftInPerson)
+  //console.log(indexOfCurrentGift)
+  // currentPerson.gifts.splice(indexOfCurrentGift,1)
+  // await Person.findByIdAndUpdate(req.params.id,{...currentPerson},{new:true,runValidators:true}) 
+  // console.log(currentPerson.gifts)
+  //await
+  // if(currentPerson.owner == req.user._id){ 
+  //   try {
+  //     const gift = await Gift.findByIdAndRemove(req.params.giftId)
+  //     currentPerson.gifts.id(req.params.giftId).remove()     
+  //     res.json({data: formatResponseData('gifts', gift.toObject())})
+  //   } catch (err) {
+  //     sendResourceNotFound(req, res)
+  //   }
+  // }else{
+  //   return NotTheOwnerDeleteError(res)
+  // }
+//})
 
 /**
  * Format the response data object according to JSON:API v1.0

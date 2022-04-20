@@ -64,17 +64,12 @@ router.post('/tokens', sanitizeBody, async (req, res) => {
 
 // Get the currently logged-in user
 router.get('/users/me', authenticate, async (req, res) => {
-  const user = await findById(req.user._id)
+  const user = await User.findById(req.user._id)
   res.json(formatResponseData(user))
 })
 
 // User can Change his password
-router.patch('/users/me', authenticate, sanitizeBody, async (req, res) => {
-
-  // const user = await User.findById(req.user._id)
-  // if(user.isAdmin === false){
-  //   return sendNotAdminError(res)
-  // }
+router.patch('/users/me', authenticate, sanitizeBody, async (req, res) => {  
   
       try {      
         const user = await findByIdAndUpdate(
